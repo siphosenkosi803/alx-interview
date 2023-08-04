@@ -1,52 +1,115 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """
-The N queens puzzle
-is the challenge of placing N non-attacking queens on an N×N chessboard.
+The N queens puzzle is the challenge of
+placing N non-attacking queens on an N×N chessboard
 """
 import sys
 
-def vibes_c(board, row, col):
-    # Check if the current position (row, col) is safe for placing a queen
-    for i in range(row):
-        if board[i] == col or abs(board[i] - col) == abs(i - row):
-            # If there's already a queen in the same column or on the same diagonal, return False (not safe)
-            return False
-    return True
 
-def fixer(N, board, row):
-    # Recursive function to solve the N-Queens problem
-    if row == N:
-        # If all rows are filled (all queens are placed), print the solution
-        print([[i, board[i]] for i in range(N)])
-        return
-    for col in range(N):
-        if vibes_c(board, row, col):
-            # If the current position is safe, place a queen and move to the next row
-            board[row] = col
-            fixer(N, board, row + 1)
+def new_slate(n):
+    """sets the fimensions of the board"""
+    board = []
+    [board.append([]) for i in range(n)]
+    [row.append(' ') for i in range(n) for row in board]
+    return (board)
 
-def nqueens(N):
-    # Main function to solve the N-Queens problem for the given N
-    if not isinstance(N, int):
-        print("N must be a number")
-        sys.exit(1)
 
-    if N < 4:
-        print("N must be at least 4")
-        sys.exit(1)
+def vault_cp(board):
+    """
+    shadow clone technique
+    on the board"""
+    if isinstance(board, list):
+        return list(map(vault_cp, board))
+    return (board)
 
-    board = [-1] * N
-    fixer(N, board, 0)
+
+def fetch_b(board):
+    """Return the list of lists representation of a solved chessboard."""
+    panacea = []
+    for r in range(len(board)):
+        for c in range(len(board)):
+            if board[r][c] == "Q":
+                panacea.append([r, c])
+                break
+    return (panacea)
+
+
+def no_more(board, row, col):
+    """
+    """
+    # X out all forward spots
+    for c in range(col + 1, len(board)):
+        board[row][c] = "x"
+    # X out all backwards spots
+    for c in range(col - 1, -1, -1):
+        board[row][c] = "x"
+    # X out all spots below
+    for r in range(row + 1, len(board)):
+        board[r][col] = "x"
+    # X out all spots above
+    for r in range(row - 1, -1, -1):
+        board[r][col] = "x"
+    # X out all spots diagonally down to the right
+    c = col + 1
+    for r in range(row + 1, len(board)):
+        if c >= len(board):
+            break
+        board[r][c] = "x"
+        c += 1
+    # X out all spots diagonally up to the left
+    c = col - 1
+    for r in range(row - 1, -1, -1):
+        if c < 0:
+            break
+        board[r][c]
+        c -= 1
+    # X out all spots diagonally up to the right
+    c = col + 1
+    for r in range(row - 1, -1, -1):
+        if c >= len(board):
+            break
+        board[r][c] = "x"
+        c += 1
+    # X out all spots diagonally down to the left
+    c = col - 1
+    for r in range(row + 1, len(board)):
+        if c < 0:
+            break
+        board[r][c] = "x"
+        c -= 1
+
+
+def c_puzzle(board, row, queens, panaceas):
+    """
+    solve an N-queens puzzle.
+    """
+    if queens == len(board):
+        panaceas.append(fetch_b(board))
+        return (panaceas)
+
+    for c in range(len(board)):
+        if board[row][c] == " ":
+            tmp_board = vault_cp(board)
+            tmp_board[row][c] = "Q"
+            no_more(tmp_board, row, c)
+            panaceas = c_puzzle(tmp_board, row + 1,
+                                        queens + 1, panaceas)
+
+    return (panaceas)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
-
-    try:
-        N = int(sys.argv[1])
-        nqueens(N)
-    except ValueError:
+    if sys.argv[1].isdigit() is False:
         print("N must be a number")
         sys.exit(1)
+    if int(sys.argv[1]) < 4:
+        print("N must be at least 4")
+        sys.exit(1)
 
+    board = new_slate(int(sys.argv[1]))
+    panaceas = c_puzzle(board, 0, 0, [])
+    for sol in panaceas:
+        print(sol)
