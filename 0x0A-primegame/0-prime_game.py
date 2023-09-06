@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """
-
+A Python Prime Number Game
 """
 
 
 def OptimusPrimo(n):
-    """
+    """gets list of primes to be used
 
     """
     Sentinel = []
@@ -19,8 +19,7 @@ def OptimusPrimo(n):
 
 
 def isWinner(x, nums):
-    """
-    
+    """gets the game winner 
     """
     if x is None or nums is None or x == 0 or nums == []:
         return None
@@ -36,3 +35,4 @@ def isWinner(x, nums):
     elif Ben > Maria:
         return 'Ben'
     return None
+
